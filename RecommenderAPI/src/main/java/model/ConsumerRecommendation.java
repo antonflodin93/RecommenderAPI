@@ -2,12 +2,15 @@ package model;
 
 import java.util.List;
 
+import javax.validation.constraints.Null;
+
 public class ConsumerRecommendation {
 	private Long consumerId;
 	private List<ProductScores> recommendations;
 	private Long organizationId;
 	private String timestamp;
 	private long weekDay;
+	private String timeOfDay;
 
 	public ConsumerRecommendation() {
 		super();
@@ -58,6 +61,15 @@ public class ConsumerRecommendation {
 	public void setWeekDay(long weekDay) {
 		this.weekDay = weekDay;
 	}
+
+	public String getTimeOfDay() {
+		return timeOfDay;
+	}
+
+	public void setTimeOfDay(String timeOfDay) {
+		this.timeOfDay = timeOfDay;
+	}
+	
 	
 	
 	

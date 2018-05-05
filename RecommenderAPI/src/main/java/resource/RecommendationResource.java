@@ -29,7 +29,6 @@ public class RecommendationResource {
 
 		return (recommendationService.getGeneralRecommendation(consumerId));
 	}
-	
 
 	// Get recommendation based on organization
 	@GET
@@ -39,18 +38,6 @@ public class RecommendationResource {
 			@PathParam("consumerId") int consumerId) {
 
 		return (recommendationService.getOrganizationRecommendation(organizationId, consumerId));
-	}
-	
-	// Get list of organization
-	@GET
-	@Path("organizations")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getOrganizations(@PathParam("organizationId") int organizationId) {
-
-		List<Long> organizationIds = recommendationService.getOrganizations(organizationId);
-		GenericEntity<List<Long>> entity = new GenericEntity<List<Long>>(organizationIds) {};
-		
-		return Response.ok(entity).build();
 	}
 
 	// Get recommendation based on week day
@@ -74,24 +61,39 @@ public class RecommendationResource {
 	}
 
 	@GET
-	@Path("/query")
-	public String test(@Context UriInfo uriInfo, @PathParam("organizationId") int organizationId) {
-
-		// Check which kind of recommendation requested
-
+	@Path("query")
+	public ConsumerRecommendation test(@Context UriInfo uriInfo) {
+		
+		// Manage queries like http://localhost:8080/RecommenderAPI/recommendations/query?consumer=82974&&weekDay=6
+		List<String> consumerList = uriInfo.getQueryParameters().get("consumer");
 		List<String> timeOfDayList = uriInfo.getQueryParameters().get("timeOfDay");
-		// System.out.println("timeOfDayList: " + timeOfDayList);
+		List<String> weekDayList = uriInfo.getQueryParameters().get("weekDay");
+		List<String> organizationsList = uriInfo.getQueryParameters().get("organization");
 
-		if (uriInfo.getQueryParameters().get("timeOfDay") != null) {
-			System.out.println("Conaints timeofday");
-		} else {
-			System.out.println("Dont contains!");
+		ConsumerRecommendation consumerRecommendation = null;
+		if (uriInfo.getQueryParameters().get("timeOfDay") != null
+				&& uriInfo.getQueryParameters().get("consumer") != null) {
+			String timeOfDay = timeOfDayList.get(0);
+			int consumerId = Integer.parseInt(consumerList.get(0));
+			consumerRecommendation = recommendationService.getTimeOfDayRecommendation(timeOfDay, consumerId);
+
+		} else if (uriInfo.getQueryParameters().get("weekDay") != null
+				&& uriInfo.getQueryParameters().get("consumer") != null) {
+			int weekDay = Integer.parseInt(weekDayList.get(0));
+			int consumerId = Integer.parseInt(consumerList.get(0));
+			consumerRecommendation = recommendationService.getWeekDayRecommendation(weekDay, consumerId);
+			
+		} else if (uriInfo.getQueryParameters().get("organization") != null
+				&& uriInfo.getQueryParameters().get("consumer") != null) {
+			int organizationId = Integer.parseInt(organizationsList.get(0));
+			int consumerId = Integer.parseInt(consumerList.get(0));
+			consumerRecommendation = recommendationService.getOrganizationRecommendation(organizationId, consumerId);
+		} else if (uriInfo.getQueryParameters().get("consumer") != null) {
+			int consumerId = Integer.parseInt(consumerList.get(0));
+			consumerRecommendation = recommendationService.getGeneralRecommendation(consumerId);
 		}
+		
+		return consumerRecommendation;
 
-		System.out.println("organizationId: " + organizationId);
-		System.out.println(uriInfo.getQueryParameters());
-		System.out.println(uriInfo.getQueryParameters().size());
-		return "hej";
 	}
-
 }
