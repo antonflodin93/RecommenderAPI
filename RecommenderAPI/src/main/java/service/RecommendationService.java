@@ -77,34 +77,6 @@ public class RecommendationService {
 		return consumerRecommendation;
 	}
 
-	public List<Long> getOrganizations(int organizationId) {
-		CodecRegistry pojoCodecRegistry = fromRegistries(MongoClient.getDefaultCodecRegistry(),
-				fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-
-		MongoClient mongoClient = new MongoClient(DBAddress,
-				MongoClientOptions.builder().codecRegistry(pojoCodecRegistry).build());
-
-		MongoDatabase db = mongoClient.getDatabase(DBName);
-
-		MongoCollection<ConsumerRecommendation> collection = db.getCollection(organizationRecommendationCollectionName,
-				ConsumerRecommendation.class);
-
-		BasicDBObject query = new BasicDBObject();
-
-		FindIterable<ConsumerRecommendation> cursor = collection.find(query);
-
-		
-		ArrayList<Long> organizations = new ArrayList<>();
-
-		for(ConsumerRecommendation c : cursor) {
-			if(!organizations.contains(c)) {
-				organizations.add(c.getOrganizationId());
-			}
-		}
-	
-		mongoClient.close();
-		return organizations;
-	}
 
 	public ConsumerRecommendation getWeekDayRecommendation(int weekDayNumber, int consumerId) {
 		CodecRegistry pojoCodecRegistry = fromRegistries(MongoClient.getDefaultCodecRegistry(),
